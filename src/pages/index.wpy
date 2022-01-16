@@ -74,7 +74,7 @@ module.exports.getTime = getTime;
       />
     </div>
 
-    <van-popup v-model="show">内容</van-popup>
+    <!-- <van-popup v-model="show">内容</van-popup> -->
 
     <!-- 底部 -->
     <van-divider divider-line-height="0.8rem">我的底线在此</van-divider>
