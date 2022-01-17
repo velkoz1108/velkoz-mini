@@ -1,0 +1,46 @@
+<style lang="less">
+
+</style>
+<wxs module="m1" lang="babel">
+
+</wxs>
+<template>
+    <div class="container">
+       
+    </div>
+</template>
+
+<script>
+import wepy from '@wepy/core';
+import eventHub from '../common/eventHub';
+import { mapState } from '@wepy/x';
+import store from '../store';
+import testMixin from '../mixins/test';
+
+wepy.page({
+  store,
+  config: {
+    navigationBarTitleText: 'test'
+  },
+
+  mixins: [testMixin],
+
+  data: {
+    value: ''
+  },
+
+  computed: {},
+
+  methods: {
+  },
+  created() {}
+});
+</script>
+<config>
+{
+    navigationBarTitleText: '模板',
+    usingComponents: {
+      "van-button": "module:@vant/weapp/dist/button/index",
+    }
+}
+</config>

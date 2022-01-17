@@ -61,8 +61,21 @@ wepy.app({
 {
     pages: [
       'pages/index',
-      'pages/add'
+      'pages/add',
+      'pages/demo',
     ],
+    //配置权限
+      "permission": {
+        "scope.userLocation": {
+          "desc": "我就想获取你的位置咋了？？？" // 高速公路行驶持续后台定位
+        },
+        "scope.userInfo": {
+          "desc": "就获取昵称和头像，不用担心泄露"
+        },
+        "scope.camera":{
+          "desc": "使用一下相机"
+        }
+  },
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',

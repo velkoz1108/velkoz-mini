@@ -72,7 +72,7 @@ module.exports.getTime = getTime;
     <!-- <van-popup v-model="show">内容</van-popup> -->
 
     <!-- 底部 -->
-    <van-divider divider-line-height="0.8rem">我的底线在此</van-divider>
+    <van-divider divider-line-height="0.8rem" @click="goDemoPage()">我的底线在此</van-divider>
 
     <van-toast id="van-toast" />
     <!-- <div style="width:100%;height:30rem;">
@@ -162,6 +162,9 @@ wepy.page({
       // this.userInfo.nickName = 'Eden';
       // wx.toast('aaa')
       wx.navigateTo({ url: '/pages/add' });
+    },
+    goDemoPage(){
+      wx.navigateTo({ url: '/pages/demo' });
     },
     onConfirm(date) {
       this.show = false;
