@@ -21,22 +21,19 @@
                 name="纪念日名称"
                 label="纪念日名称"
                 placeholder="纪念日名称"
-                :rules="[{ required: true, message: '请填写纪念日名称' }]"
             />
 
             <van-field
                 readonly
                 clickable
                 name="calendar"
-                :value="value"
+                :value="date"
                 label="日历"
                 placeholder="点击选择日期"
                 @click="showCalendar = true"
             />
-            <van-calendar
-                v-model="showCalendar"
-                @confirm="onConfirm"
-            />
+
+            <van-calendar show="{{ showCalendar }}" :style="{ height: '50%' }" color="#1989fa" @close="onClose" @confirm="onConfirm" />
 
             <div style="margin: 16px;">
                 <van-button
@@ -44,6 +41,7 @@
                     block
                     type="info"
                     native-type="submit"
+                    @click="save"
                 >提交</van-button>
             </div>
         </van-form>
@@ -56,9 +54,6 @@ import eventHub from '../common/eventHub';
 import { mapState } from '@wepy/x';
 import store from '../store';
 import testMixin from '../mixins/test';
-// import Toast from '@vant/weapp/lib/toast/toast';
-import Toast from '@vant/weapp/lib/toast/toast';
-import Input from '@vant/weapp/lib/field/index';
 
 wepy.page({
   store,
@@ -71,16 +66,29 @@ wepy.page({
   data: {
     showCalendar: false,
     username: '',
-    value: ''
+    date: ''
   },
 
   computed: {},
 
   methods: {
+    formatDate(date) {
+      return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    },
     onConfirm(date) {
-      console.log(date);
-      this.value = `${date.getMonth() + 1}/${date.getDate()}`;
+      console.log(date.$wx.detail);
+      this.date = this.formatDate(date.$wx.detail);
       this.showCalendar = false;
+    },
+    onClose(e) {
+      console.log('close calendar ... ', e);
+      this.showCalendar = false;
+    },
+    onSubmit(){
+      console.log('form submit ...')
+    },
+    save(){
+      console.log('save data ...')
     }
   },
   created() {}
@@ -94,6 +102,8 @@ wepy.page({
       "van-image": "module:@vant/weapp/dist/image/index",
       "van-field": "module:@vant/weapp/dist/field/index",
       "van-calendar": "module:@vant/weapp/dist/calendar/index",
+      "van-popup": "module:@vant/weapp/dist/popup/index",
+      "van-toast": "module:@vant/weapp/dist/toast/index",
     }
 }
 </config>
