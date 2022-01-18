@@ -19,35 +19,22 @@ const getTime = (time) => {
 module.exports.getTime = getTime;
 </wxs>
 <template>
-  <div
-    class="container"
-    id="app"
-  >
-    <van-notice-bar
-      style="width:100%;"
-      scrollable
-      text="在代码阅读过程中人们说脏话的频率是衡量代码质量的唯一标准。"
-    />
+  <div class="container" id="app">
+    <van-notice-bar style="width:100%;" scrollable text="在代码阅读过程中人们说脏话的频率是衡量代码质量的唯一标准。" />
 
     <van-row style="width:30%;margin:1rem;">
-      <van-col
-        span="24"
-      >
-      <open-data  type="userAvatarUrl"></open-data>
-      
+      <van-col span="24">
+        <open-data type="userAvatarUrl"></open-data>
       </van-col>
     </van-row>
     <van-row style="margin:0rem;">
-      <van-col style="text-align:center;line-height:2rem;height:2rem;"><open-data type="userNickName"></open-data></van-col>
+      <van-col style="text-align:center;line-height:2rem;height:2rem;">
+        <open-data type="userNickName"></open-data>
+      </van-col>
     </van-row>
 
-    <van-row
-      v-for="item in reminderList"
-      :key="item"
-      style="width:100%;margin:1rem;"
-    >
+    <van-row v-for="item in reminderList" :key="item" style="width:100%;margin:1rem;">
       <van-cell-group inset>
-
         <van-cell
           :icon="item.icon"
           center
@@ -62,22 +49,36 @@ module.exports.getTime = getTime;
     <!-- 侧边按钮 -->
 
     <div style="position:fixed;top:3rem;right:1rem;z-index: 100;">
-      <van-icon
-        name="edit"
-        size="30"
-        @click="addReminder()"
-      />
+      <van-icon name="edit" size="30" @click="addReminder()" />
     </div>
 
     <!-- <van-popup v-model="show">内容</van-popup> -->
 
     <!-- 底部 -->
-    <van-divider divider-line-height="0.8rem" @click="goDemoPage()">我的底线在此</van-divider>
-
-    <van-toast id="van-toast" />
-    <!-- <div style="width:100%;height:30rem;">
-    <van-calendar v-show="show" @confirm="onConfirm" />
-  </div> -->
+    <van-divider divider-line-height="0.8rem" @click="showPopup">我的底线在此</van-divider>
+<!--    -->
+    <van-popup
+      wx:if="{{show}}"
+      show="{{ show }}"
+      style="width:100%;"
+      position="center"
+      @close="closeClick"
+    >
+    <div style="width:18rem;">
+      <van-row >
+        <van-col span="20">
+          <van-field
+            :value="pageUrl"
+            label="页面地址"
+            @blur="myBlur($event, 'pageUrl')"
+          />
+        </van-col>
+        <van-col span="4">
+          <van-button type="info" @click="goTargetPage">跳转</van-button>
+        </van-col>
+      </van-row>
+      </div>
+    </van-popup>
   </div>
 </template>
 
@@ -113,7 +114,8 @@ wepy.page({
   data: {
     show: false,
     userInfo: {
-      nickName: '加载中...'
+      nickName: '加载中...',
+      pageUrl: 'url'
     },
     reminderList: [
       {
@@ -155,23 +157,27 @@ wepy.page({
 
   methods: {
     addReminder() {
-      console.log('1222');
-      this.show = true;
-      //  this.$toast('1222')
-      // Toast.success("程序猿小哥哥还在努力开发中...");
-      // this.userInfo.nickName = 'Eden';
-      // wx.toast('aaa')
       wx.navigateTo({ url: '/pages/add' });
     },
-    goDemoPage(){
-      wx.navigateTo({ url: '/pages/demo' });
+    goTargetPage() {
+      console.log(this.pageUrl);
+      wx.navigateTo({ url: this.pageUrl });
     },
-    onConfirm(date) {
+    showPopup() {
+      this.show = true;
+    },
+    closeClick() {
       this.show = false;
-      this.date = this.formatDate(date);
     },
     formatDate(date) {
       return `${date.getMonth() + 1}/${date.getDate()}`;
+    },
+    myBlur(e, name) {
+      console.log(e);
+      console.log(name);
+      if (name === 'pageUrl') {
+        this.pageUrl = e.$wx.detail.value;
+      }
     }
   },
   created() {
@@ -217,6 +223,7 @@ wepy.page({
       "van-toast": "module:@vant/weapp/dist/toast/index",
       "transition": "module:@vant/weapp/dist/transition/index",
       "van-calendar": "module:@vant/weapp/dist/calendar/index",
+      "van-field":  "module:@vant/weapp/dist/field/index",
     }
 }
 </config>

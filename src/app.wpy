@@ -63,6 +63,7 @@ wepy.app({
       'pages/index',
       'pages/add',
       'pages/demo',
+      'pages/example',
     ],
     //配置权限
       "permission": {
