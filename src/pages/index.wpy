@@ -181,24 +181,15 @@ wepy.page({
     }
   },
   created() {
-    // wx.canIUse('button.open-type.getUserInfo')
-    // wx.login({
-    //   success(res) {
-    //     if (res.code) {
-    //       console.log('登录成功');
-    //     } else {
-    //       console.log('登录失败' + res.errMsg);
-    //     }
-    //   }
-    // });
-    // let self = this;
-    // wx.getUserInfo({
-    //   withCredentials:true,
-    //   success(res) {
-    //     console.log(res);
-    //     self.userInfo = res.userInfo;
-    //   }
-    // });
+    let self = this;
+    wx.cloud.init();
+    const db = wx.cloud.database();
+    db.collection('reminder').get({
+      success: function(res) {
+        // res.data 是一个包含集合中有权限访问的所有记录的数据，不超过 20 条
+        self.reminderList = res.data;
+      }
+    });
   }
 });
 </script>
