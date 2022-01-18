@@ -1,45 +1,59 @@
 <style lang="less">
-.container{
-    width:100%;
+.container {
+  width: 100%;
 }
 </style>
 <wxs module="m1" lang="babel">
 
 </wxs>
 <template>
-    <div class="container">
-        <van-row style="width:90%;margin-top:2rem;" gutter="5">
-            <van-col span="8">
-                <van-button type="primary" @click="getUserInfo">获取用户基本信息</van-button>
-       </van-col>
+  <div class="container">
+    <van-row style="width:90%;margin-top:2rem;" gutter="5">
+      <van-col span="8">
+        <van-button type="primary" @click="getUserInfo">获取用户基本信息</van-button>
+      </van-col>
 
-        <van-col span="8">
+      <van-col span="8">
         <!-- 个人小程序无法获取 -->
-             <van-button type="info" open-type="getPhoneNumber" @click="getPhoneNumber">获取用户手机号</van-button>
-        </van-col>
+        <van-button type="info" open-type="getPhoneNumber" @click="getPhoneNumber">获取用户手机号</van-button>
+      </van-col>
 
-        <van-col span="8">
-            <van-button type="warning" @click="getPosition">获取地理位置</van-button>
-        </van-col>
-       </van-row>
+      <van-col span="8">
+        <van-button type="warning" @click="getPosition">获取地理位置</van-button>
+      </van-col>
+    </van-row>
 
-       <div class="van-multi-ellipsis--l3" style="margin: 1rem">
-           注意：目前该接口针对非个人开发者，且完成了认证的小程序开放（不包含海外主体）。需谨慎使用，若用户举报较多或被发现在不必要场景下使用，微信有权永久回收该小程序的该接口权限。
+    <div
+      class="van-multi-ellipsis--l3"
+      style="margin: 1rem"
+    >注意：目前该接口针对非个人开发者，且完成了认证的小程序开放（不包含海外主体）。需谨慎使用，若用户举报较多或被发现在不必要场景下使用，微信有权永久回收该小程序的该接口权限。</div>
 
-</div>
-
-       <div v-for="(value, key) in userInfo.userInfo" :key="key"  style="width:100%">
-           <div v-if="key=='avatarUrl'">
-                <van-cell :title="key" value="查看" @click="showImage(value)" /> 
-           </div>
-           <div v-if="key!='avatarUrl'">
-                <van-cell :title="key" :value="value" @click="showD"/> 
-           </div>
-         
-       </div>
-       <van-cell v-if="userInfo.userInfo" title="cloudID" :value="userInfo.cloudID" style="width:100%"/>
-        <van-toast id="van-toast" style="width:100%;height:10rem;" />
+    <div v-for="(value, key) in userInfo.userInfo" :key="key" style="width:100%">
+      <div v-if="key == 'avatarUrl'">
+        <van-cell :title="key" value="查看" @click="showImage(value)" />
+      </div>
+      <div v-if="key != 'avatarUrl'">
+        <van-cell :title="key" :value="value" />
+      </div>
     </div>
+    <van-cell
+      v-if="userInfo.userInfo"
+      title="cloudID"
+      :value="userInfo.cloudID"
+      style="width:100%"
+    />
+    <van-toast id="van-toast" style="width:100%;height:10rem;" />
+
+    <van-popup
+      wx:if="{{show}}"
+      show="{{ show }}"
+      :style="{ height: '30%', width: '30%', margin: '0rem' }"
+      position="center"
+      @close="closeClick"
+    >
+        <van-image width="10rem" height="10rem" :src="currentImage" />
+    </van-popup>
+  </div>
 </template>
 
 <script>
@@ -49,6 +63,7 @@ import { mapState } from '@wepy/x';
 import store from '../store';
 import testMixin from '../mixins/test';
 import Toast from '@vant/weapp/lib/toast/toast';
+import Popup from '@vant/weapp/lib/popup/index';
 
 wepy.page({
   store,
@@ -59,7 +74,9 @@ wepy.page({
   mixins: [testMixin],
 
   data: {
-    userInfo: {}
+    userInfo: {},
+    show: false,
+    currentImage: 'https://img01.yzcdn.cn/vant/cat.jpeg'
   },
 
   computed: {},
@@ -77,13 +94,9 @@ wepy.page({
     getPhoneNumber(e) {
       console.log(e);
     },
-    showImage(imageUrl){
-        console.log(imageUrl)
-        Toast({
-        message: '我的头像',
-        icon: 'like-o',
-        // icon: 'https://img01.yzcdn.cn/vant/logo.png',
-        });
+    showImage(imageUrl) {
+      this.currentImage = imageUrl;
+      this.show = true;
     },
     getPosition() {
       wx.getLocation({
@@ -96,6 +109,12 @@ wepy.page({
           console.log('location --> ', res);
         }
       });
+    },
+    showPopup() {
+      this.show = true;
+    },
+    closeClick() {
+      this.show = false;
     }
   },
   created() {
@@ -113,13 +132,17 @@ wepy.page({
 </script>
 <config>
 {
-    navigationBarTitleText: '模板',
+    navigationBarTitleText: 'Demo',
     usingComponents: {
       "van-button": "module:@vant/weapp/dist/button/index",
       "van-col": "module:@vant/weapp/dist/col/index",
        "van-row": "module:@vant/weapp/dist/row/index",
        "van-cell": "module:@vant/weapp/dist/cell/index",
        "van-toast": "module:@vant/weapp/dist/toast/index",
+       "van-popup": "module:@vant/weapp/dist/popup/index",
+       "van-icon":"module:@vant/weapp/dist/icon/index",
+       "van-overlay":"module:@vant/weapp/dist/overlay/index",
+       "van-image": "module:@vant/weapp/dist/image/index",
     }
 }
 </config>
