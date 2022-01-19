@@ -24,7 +24,7 @@
 
       <!-- 选择类型 -->
 
-      <van-field
+      <!-- <van-field
         readonly
         clickable
         name="picker"
@@ -40,7 +40,7 @@
           @confirm="onConfirmType"
           @cancel="showPicker = false"
         />
-      </van-popup>
+      </van-popup> -->
 
       <!-- 日期选择 -->
 
@@ -57,6 +57,8 @@
       <van-calendar
         show="{{ showCalendar }}"
         :style="{ height: '50%' }"
+        :minDate="minDate" 
+        :maxDate="maxDate" 
         color="#1989fa"
         @close="onClose"
         @confirm="onConfirm"
@@ -75,6 +77,8 @@
       <van-popup wx:if="{{showIconPicker}}" show="{{ showIconPicker }}" position="bottom">
         <van-picker
           show-toolbar
+          allow-html="true"
+          title="选择图标"
           :columns="iconList"
           @confirm="onConfirmIcon"
           @cancel="showIconPicker = false"
@@ -87,6 +91,8 @@
         <van-button round block type="info" native-type="submit" @click="save">提交</van-button>
       </div>
     </van-form>
+
+     <van-toast id="van-toast" style="width:100%;height:10rem;" />
   </div>
 </template>
 
@@ -96,6 +102,7 @@ import eventHub from '../common/eventHub';
 import { mapState } from '@wepy/x';
 import store from '../store';
 import testMixin from '../mixins/test';
+import Toast from '@vant/weapp/lib/toast/toast';
 
 wepy.page({
   store,
@@ -108,19 +115,47 @@ wepy.page({
   data: {
     showCalendar: false,
     showPicker: false,
+    minDate: new Date(2021, 0, 1),
+    maxDate: new Date(2023, 0, 31),
     name: '',
+    radio: '1',
     date: '',
+    days: '0天',
+    of: '',
     reminderType: '纪念日',
     reminderTypeId: 0,
     columns: ['纪念日', '倒数日'],
     showIconPicker: false,
-    iconName: 'like-o',
-    iconId: 0,
-    iconList: ['like-o', 'chat-o', 'fire-o'],
+    iconName: '🔥',
+    iconKey: 'fire',
+    iconList: [
+      { text: '❤', key: 'like' },
+      { text: '🔥', key: 'fire' },
+      { text: '⭐️', key: 'star' },
+      { text: '💎', key: 'gem' },
+      { text: '🔐', key: 'lock' }
+    ],
     db: {}
   },
 
-  computed: {},
+  computed: {
+    maxDate() {
+      const now = new Date();
+      return new Date(
+        now.getFullYear(),
+        now.getMonth() + 6,
+        now.getDate()
+      ).getTime();
+    },
+    minDate() {
+      const now = new Date();
+      return new Date(
+        now.getFullYear(),
+        now.getMonth() - 6,
+        now.getDate()
+      ).getTime();
+    }
+  },
 
   methods: {
     formatDate(date) {
@@ -150,27 +185,58 @@ wepy.page({
       this.showPicker = false;
     },
     onConfirmIcon(value) {
-      this.iconName = value.$wx.detail.value;
-      this.iconId = value.$wx.detail.index;
+      console.log('icon --> ', value);
+      this.iconName = value.$wx.detail.value.text;
+      this.iconKey = value.$wx.detail.value.key;
       this.showIconPicker = false;
     },
     save() {
       console.log('save data ...');
       if (this.name == '') {
         console.log('name is empty');
+        Toast.fail('必填项不能为空');
         return;
       }
+      if (this.iconKey == '') {
+        this.iconKey = 'like';
+      }
+      // 计算日期差几天
+      const now = new Date();
+      const tagetDate = new Date(this.date);
+      let diff = tagetDate - now;
+      const diffDays = parseInt(Math.abs(diff) / (1 * 24 * 60 * 60 * 1000));
+      if (diffDays < 0) {
+        //纪念日
+        console.log('这是纪念日', diffDays);
+        this.reminderType = '纪念日';
+        this.reminderTypeId = 0;
+        this.days = diffDays + '天';
+        this.of = '已经';
+      } else {
+        //倒数日
+        console.log('这是倒数日', diffDays);
+        this.reminderType = '倒数日';
+        this.reminderTypeId = 1;
+        this.days = diffDays + 1 + '天';
+        this.of = '还有';
+      }
+
       this.db.collection('reminder').add({
         data: {
-          icon: 'fire-o',
+          icon: this.iconKey,
           name: this.name,
-          reminderName: '纪念日',
-          reminderType: '0',
-          days: '366天'
+          reminderName: this.reminderType,
+          reminderType: this.reminderTypeId,
+          of: this.of,
+          days: this.days
         },
         success: function(res) {
           // res 是一个对象，其中有 _id 字段标记刚创建的记录的 id
           console.log(res);
+          Toast.success('添加成功，即将返回首页');
+          setTimeout(() => {
+            wx.navigateTo({ url: '/pages/index' });
+          }, 2000);
         }
       });
     }
@@ -193,6 +259,9 @@ wepy.page({
       "van-popup": "module:@vant/weapp/dist/popup/index",
       "van-toast": "module:@vant/weapp/dist/toast/index",
       "van-picker": "module:@vant/weapp/dist/picker/index",
+      "van-icon": "module:@vant/weapp/dist/icon/index",
+      "van-radio":"module:@vant/weapp/dist/radio/index",
+      "van-radio-group":"module:@vant/weapp/dist/radio-group/index",
     }
 }
 </config>

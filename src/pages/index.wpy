@@ -39,7 +39,7 @@ module.exports.getTime = getTime;
           :icon="item.icon"
           center
           title-style="margin-left:1rem;"
-          :title="item.name"
+          :title="item.name+' '+item.of"
           :value="item.days"
           :label="item.reminderName"
         />
@@ -121,34 +121,11 @@ wepy.page({
       {
         id: 1,
         icon: 'like-o',
-        name: '迈锐宝XL已经',
+        name: '迈锐宝XL',
         reminderName: '纪念日',
         reminderType: '0',
+        of: '已经',
         days: '1314天'
-      },
-      {
-        id: 2,
-        icon: 'fire-o',
-        name: '结婚已经',
-        reminderName: '纪念日',
-        reminderType: '0',
-        days: '13140天'
-      },
-      {
-        id: 3,
-        icon: 'chat-o',
-        name: '永不为奴还有',
-        reminderName: '倒数日',
-        reminderType: '1',
-        days: '5201天'
-      },
-      {
-        id: 4,
-        icon: 'chat-o',
-        name: '虎年春节还有',
-        reminderName: '倒数日',
-        reminderType: '1',
-        days: '16天'
       }
     ]
   },
