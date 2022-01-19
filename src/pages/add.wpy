@@ -11,42 +11,83 @@
 
 </wxs>
 <template>
-    <div class="container">
-        <van-form
-            @submit="onSubmit"
-            style="width:100%;height:100px"
-        >
-            <van-field
-                :value="name"
-                name="纪念日名称"
-                label="纪念日名称"
-                placeholder="纪念日名称"
-                 @blur="myBlur($event, 'name')"
-            />
+  <div class="container">
+    <van-form @submit="onSubmit" style="width:100%;height:100px">
+      <!-- 纪念日名称 -->
+      <van-field
+        :value="name"
+        name="纪念日名称"
+        label="纪念日名称"
+        placeholder="请输入纪念日名称"
+        @blur="myBlur($event, 'name')"
+      />
 
-            <van-field
-                readonly
-                clickable
-                name="calendar"
-                :value="date"
-                label="日历"
-                placeholder="点击选择日期"
-                @click="showCalendar = true"
-            />
+      <!-- 选择类型 -->
 
-            <van-calendar show="{{ showCalendar }}" :style="{ height: '50%' }" color="#1989fa" @close="onClose" @confirm="onConfirm" />
+      <van-field
+        readonly
+        clickable
+        name="picker"
+        :value="reminderType"
+        label="纪念日类型"
+        placeholder="点击选择类型"
+        @click="showPicker = true"
+      />
+      <van-popup wx:if="{{showPicker}}" show="{{ showPicker }}" position="bottom">
+        <van-picker
+          show-toolbar
+          :columns="columns"
+          @confirm="onConfirmType"
+          @cancel="showPicker = false"
+        />
+      </van-popup>
 
-            <div style="margin: 16px;">
-                <van-button
-                    round
-                    block
-                    type="info"
-                    native-type="submit"
-                    @click="save"
-                >提交</van-button>
-            </div>
-        </van-form>
-    </div>
+      <!-- 日期选择 -->
+
+      <van-field
+        readonly
+        clickable
+        name="calendar"
+        :value="date"
+        label="日历"
+        placeholder="点击选择日期"
+        @click="showCalendar = true"
+      />
+
+      <van-calendar
+        show="{{ showCalendar }}"
+        :style="{ height: '50%' }"
+        color="#1989fa"
+        @close="onClose"
+        @confirm="onConfirm"
+      />
+
+      <!-- 图标 -->
+      <van-field
+        readonly
+        clickable
+        name="icon-picker"
+        :value="iconName"
+        label="图标"
+        placeholder="点击选择图标"
+        @click="showIconPicker = true"
+      />
+      <van-popup wx:if="{{showIconPicker}}" show="{{ showIconPicker }}" position="bottom">
+        <van-picker
+          show-toolbar
+          :columns="iconList"
+          @confirm="onConfirmIcon"
+          @cancel="showIconPicker = false"
+        />
+      </van-popup>
+
+
+
+      <div style="margin: 16px;">
+        <van-button round block type="info" native-type="submit" @click="save">提交</van-button>
+      </div>
+    </van-form>
+  </div>
 </template>
 
 <script>
@@ -66,8 +107,16 @@ wepy.page({
 
   data: {
     showCalendar: false,
+    showPicker: false,
     name: '',
     date: '',
+    reminderType: '纪念日',
+    reminderTypeId: 0,
+    columns: ['纪念日', '倒数日'],
+    showIconPicker: false,
+    iconName: 'like-o',
+    iconId: 0,
+    iconList: ['like-o', 'chat-o', 'fire-o'],
     db: {}
   },
 
@@ -94,11 +143,22 @@ wepy.page({
         this.name = e.$wx.detail.value;
       }
     },
+    onConfirmType(value) {
+      console.log(value);
+      this.reminderType = value.$wx.detail.value;
+      this.reminderTypeId = value.$wx.detail.index;
+      this.showPicker = false;
+    },
+    onConfirmIcon(value) {
+      this.iconName = value.$wx.detail.value;
+      this.iconId = value.$wx.detail.index;
+      this.showIconPicker = false;
+    },
     save() {
       console.log('save data ...');
-      if(this.name==''){
-        console.log('name is empty')
-          return
+      if (this.name == '') {
+        console.log('name is empty');
+        return;
       }
       this.db.collection('reminder').add({
         data: {
@@ -132,6 +192,7 @@ wepy.page({
       "van-calendar": "module:@vant/weapp/dist/calendar/index",
       "van-popup": "module:@vant/weapp/dist/popup/index",
       "van-toast": "module:@vant/weapp/dist/toast/index",
+      "van-picker": "module:@vant/weapp/dist/picker/index",
     }
 }
 </config>
