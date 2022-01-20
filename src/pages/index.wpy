@@ -33,7 +33,7 @@ module.exports.getTime = getTime;
       </van-col>
     </van-row>
 
-    <van-row v-for="item in reminderList" :key="item" style="width:100%;margin:1rem;">
+    <van-row v-for="item in reminderList" :key="item" style="width:100%;margin:1rem;" @click="showDetail">
       <van-cell-group inset>
         <van-cell
           :icon="item.icon"
@@ -41,7 +41,7 @@ module.exports.getTime = getTime;
           title-style="margin-left:1rem;"
           :title="item.name+' '+item.of"
           :value="item.days"
-          :label="item.reminderName"
+          :label="item.reminderName + ' ' + item.targetDate"
         />
       </van-cell-group>
     </van-row>
@@ -53,6 +53,11 @@ module.exports.getTime = getTime;
     </div>
 
     <!-- <van-popup v-model="show">内容</van-popup> -->
+     <van-toast id="van-toast" style="width:10rem;height:10rem;" />
+
+     <van-toast id="van-toast1" style="width:100%;height:10rem;" />
+
+     <van-toast id="van-toast2" style="width:100%;height:10rem;" />
 
     <!-- 底部 -->
     <van-divider divider-line-height="0.8rem" @click="showPopup">我的底线在此</van-divider>
@@ -120,12 +125,12 @@ wepy.page({
     reminderList: [
       {
         id: 1,
-        icon: 'like-o',
-        name: '迈锐宝XL',
-        reminderName: '纪念日',
-        reminderType: '0',
-        of: '已经',
-        days: '1314天'
+        icon: 'like',
+        name: '虎年春节',
+        reminderName: '倒数日',
+        reminderType: '1',
+        of: '还有',
+        days: '0天'
       }
     ]
   },
@@ -146,6 +151,9 @@ wepy.page({
     closeClick() {
       this.show = false;
     },
+    showDetail() {
+      Toast.fail('敬请期待');
+    },
     formatDate(date) {
       return `${date.getMonth() + 1}/${date.getDate()}`;
     },
@@ -163,8 +171,46 @@ wepy.page({
     const db = wx.cloud.database();
     db.collection('reminder').get({
       success: function(res) {
+        console.log('res --> ', res);
+
         // res.data 是一个包含集合中有权限访问的所有记录的数据，不超过 20 条
-        self.reminderList = res.data;
+        let list = res.data;
+        if (list.length == 0) {
+          list.push({
+            icon: 'like',
+            name: '虎年春节',
+            targetDate: '2022-2-1'
+          });
+        }
+        self.reminderList = [];
+        const now = new Date();
+        console.log(list);
+        for (var i = 0; i < list.length; i++) {
+          var d = list[i];
+          console.log('d --> ', d);
+          const tagetDate = new Date(d.targetDate);
+          console.log(tagetDate);
+          let diff = tagetDate - now;
+          const diffDays = parseInt(Math.abs(diff) / (1 * 24 * 60 * 60 * 1000));
+          if (diff < 0) {
+            //纪念日
+            console.log('这是纪念日', diffDays);
+            d.reminderName = '纪念日';
+            d.reminderType = 0;
+            d.days = '' + diffDays + '天';
+            d.of = '已经';
+          } else {
+            //倒数日
+            console.log('这是倒数日', diffDays);
+            d.reminderName = '倒数日';
+            d.reminderType = 1;
+            let theDays = diffDays + 1;
+            d.days = theDays + '天';
+            d.of = '还有';
+          }
+          self.reminderList.push(d);
+        }
+        console.log('data --> ', self.reminderList);
       }
     });
   }

@@ -200,35 +200,12 @@ wepy.page({
       if (this.iconKey == '') {
         this.iconKey = 'like';
       }
-      // 计算日期差几天
-      const now = new Date();
-      const tagetDate = new Date(this.date);
-      let diff = tagetDate - now;
-      const diffDays = parseInt(Math.abs(diff) / (1 * 24 * 60 * 60 * 1000));
-      if (diffDays < 0) {
-        //纪念日
-        console.log('这是纪念日', diffDays);
-        this.reminderType = '纪念日';
-        this.reminderTypeId = 0;
-        this.days = diffDays + '天';
-        this.of = '已经';
-      } else {
-        //倒数日
-        console.log('这是倒数日', diffDays);
-        this.reminderType = '倒数日';
-        this.reminderTypeId = 1;
-        this.days = diffDays + 1 + '天';
-        this.of = '还有';
-      }
 
       this.db.collection('reminder').add({
         data: {
           icon: this.iconKey,
           name: this.name,
-          reminderName: this.reminderType,
-          reminderType: this.reminderTypeId,
-          of: this.of,
-          days: this.days
+          targetDate: this.date
         },
         success: function(res) {
           // res 是一个对象，其中有 _id 字段标记刚创建的记录的 id
